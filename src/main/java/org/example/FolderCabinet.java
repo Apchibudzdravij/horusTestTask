@@ -3,9 +3,15 @@ package org.example;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FolderCabinet implements Cabinet  {
     private final List<Folder> folders;
+
+    private static final Logger logger = LoggerFactory.getLogger(FolderCabinet.class);
 
     public FolderCabinet() {
         this.folders = new ArrayList<>();
@@ -16,14 +22,14 @@ public class FolderCabinet implements Cabinet  {
     }
 
     //nie jest używana w testach, ale może być użyteczna podczas skalowania aplikacji
-    public void AddFolder(Folder folder) {
+    public void addFolder(Folder folder) {
         this.folders.add(folder);
     }
-    public void AddFolder(String name, String size) {
+    public void addFolder(String name, String size) {
         try {
             this.folders.add(new FolderFromCabinet(name, size));
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -40,7 +46,7 @@ public class FolderCabinet implements Cabinet  {
                     this.size = size;
                     break;
                 default:
-                    throw new Exception("[ERROR] Incorrect SIZE parameter value: " + size);
+                    throw new Exception("Incorrect SIZE parameter value: " + size);
             }
         }
 
@@ -59,27 +65,20 @@ public class FolderCabinet implements Cabinet  {
 
     @Override
     public Optional<Folder> findFolderByName(String name) {
-        for (Folder f: folders) {
-            if (f.getName().equals(name))
-                return Optional.of(f);
-        }
-        return Optional.empty();
+        return folders.stream()
+                .filter(f -> f.getName().equals(name))
+                .findAny();
     }
 
     @Override
     public List<Folder> findFoldersBySize(String size) {
         switch (size) {
-            case "SMALL":
-            case "MEDIUM":
-            case "LARGE":
-                List<Folder> resultList = new ArrayList<>();
-                for (Folder f : folders) {
-                    if (f.getSize().equals(size))
-                        resultList.add(f);
-                }
-                return resultList;
+            case "SMALL", "MEDIUM", "LARGE":
+                return folders.stream()
+                        .filter(f -> f.getSize().equals(size))
+                        .collect(Collectors.toList());
             default:
-                System.err.println("[ERROR] Unacceptable SIZE value provided: " + size);
+                logger.error("Unacceptable SIZE value provided: {}", size);
                 return new ArrayList<>();
         }
     }

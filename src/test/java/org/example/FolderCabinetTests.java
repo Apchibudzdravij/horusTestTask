@@ -4,34 +4,43 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 
-public class FolderCabinetTests {
+public final class FolderCabinetTests {
     private final FolderCabinet cabinet = new FolderCabinet();
 
     @Test
-    @DisplayName("Test 1")
+    @DisplayName("count Folders in FolderCabinet with 3 elements")
     public void countTest() {
-        cabinet.AddFolder("folder1", "MEDIUM");
-        cabinet.AddFolder("folder2", "SMALL");
-        cabinet.AddFolder("folder3", "LARGE");
-        cabinet.AddFolder("folder4", "incorrect size");//wyświetli błąd w konsoli
+        cabinet.addFolder("folder1", "MEDIUM");
+        cabinet.addFolder("folder2", "SMALL");
+        cabinet.addFolder("folder3", "LARGE");
+        cabinet.addFolder("folder4", "incorrect size");//wyświetli błąd w konsoli
         Assertions.assertEquals(cabinet.count(), 3);
     }
 
     @Test
-    @DisplayName("Test 2")
+    @DisplayName("get all Folders with LARGE size")
     public void findFoldersBySizeTest() {
-        cabinet.AddFolder("folder1", "MEDIUM");
-        cabinet.AddFolder("folder2", "SMALL");
-        cabinet.AddFolder("folder3", "LARGE");
-        cabinet.AddFolder("folder4", "LARGE");
+        cabinet.addFolder("folder1", "MEDIUM");
+        cabinet.addFolder("folder2", "SMALL");
+        cabinet.addFolder("folder3", "LARGE");
+        cabinet.addFolder("folder4", "LARGE");
         Assertions.assertEquals(cabinet.findFoldersBySize("LARGE").size(), 2);
     }
 
     @Test
-    @DisplayName("Test 3")
+    @DisplayName("retrieve a Folder with the name: folder1")
     public void findFolderByNameTest() {
-        cabinet.AddFolder("folder1", "MEDIUM");
-        cabinet.AddFolder("folder2", "SMALL");
-        Assertions.assertTrue(cabinet.findFolderByName("folder1").get().getSize().equals("MEDIUM"));//isPresent() is guaranteed to be true
+        cabinet.addFolder("folder1", "MEDIUM");
+        cabinet.addFolder("folder2", "SMALL");
+        Assertions.assertTrue(cabinet.findFolderByName("folder1").get().getSize().equals("MEDIUM"));//isPresent() ma gwarantowaną wartość true
+    }
+
+    @Test
+    @DisplayName("not retrieve a Folder with the name: folder3")
+    public void findFolderByNameFailTest() {
+        cabinet.addFolder("folder1", "MEDIUM");
+        cabinet.addFolder("folder1", "LARGE");
+        cabinet.addFolder("folder2", "SMALL");
+        Assertions.assertFalse(cabinet.findFolderByName("folder3").isPresent());
     }
 }
